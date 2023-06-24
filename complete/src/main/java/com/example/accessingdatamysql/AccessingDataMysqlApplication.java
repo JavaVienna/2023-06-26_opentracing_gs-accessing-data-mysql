@@ -2,7 +2,10 @@ package com.example.accessingdatamysql;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -44,6 +47,17 @@ public class AccessingDataMysqlApplication {
 								OS_NAME, "Windows 11",
 								AttributeKey.stringKey("java.version"), System.getProperty("java.version")
 						)));
+
+		// Traces
+		SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+				.setResource(resource)
+				.addSpanProcessor(SimpleSpanProcessor.create(
+						OtlpHttpSpanExporter.builder()
+								.setEndpoint(tracesEndpoint)
+								.addHeader("Authorization", authHeader)
+								.build()
+				))
+				.build();
 
 
 		SpringApplication.run(AccessingDataMysqlApplication.class, args);
