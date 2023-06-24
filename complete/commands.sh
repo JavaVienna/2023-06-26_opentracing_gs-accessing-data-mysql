@@ -4,14 +4,18 @@ exit 1
 # first, build the jar file:
 ./gradlew clean bootJar
 
-# run the jar file
+# run the jar file with the javaagent
 java \
+  -javaagent:opentelemetry-javaagent.jar                                `# add the javaagent` \
+  -Dotel.javaagent.configuration-file=otel-sdk-configuration.properties `# tell the javaagent where to find config props` \
   -jar build/libs/accessing-data-mysql-0.0.1-SNAPSHOT.jar               `# set the jar file to run`
 
 
 # combined command:
 ./gradlew clean bootJar; \
   java \
+    -javaagent:opentelemetry-javaagent.jar \
+    -Dotel.javaagent.configuration-file=otel-sdk-configuration.properties \
     -jar build/libs/accessing-data-mysql-0.0.1-SNAPSHOT.jar
 
 # generate successful load
