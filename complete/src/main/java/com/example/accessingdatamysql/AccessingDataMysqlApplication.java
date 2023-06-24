@@ -2,8 +2,11 @@ package com.example.accessingdatamysql;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
 import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.AggregationTemporalitySelector;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
@@ -79,6 +82,21 @@ public class AccessingDataMysqlApplication {
 								.build()
 				)
 				.build();
+
+		// Logs
+		SdkLoggerProvider loggerProvider = SdkLoggerProvider.builder()
+				.setResource(resource)
+				.addLogRecordProcessor(
+						BatchLogRecordProcessor.builder(
+								OtlpHttpLogRecordExporter.builder()
+										.setEndpoint(logsEndpoint)
+										.addHeader("Authorization", authHeader)
+										.build()
+						).build()
+				)
+				.build();
+
+
 
 		SpringApplication.run(AccessingDataMysqlApplication.class, args);
 	}
