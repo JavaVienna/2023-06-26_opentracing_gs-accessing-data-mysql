@@ -2,7 +2,11 @@ package com.example.accessingdatamysql;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+import io.opentelemetry.sdk.metrics.SdkMeterProvider;
+import io.opentelemetry.sdk.metrics.export.AggregationTemporalitySelector;
+import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
@@ -12,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Properties;
 
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.OS_NAME;
@@ -59,6 +64,21 @@ public class AccessingDataMysqlApplication {
 				))
 				.build();
 
+		// Metrics
+		SdkMeterProvider meterProvider = SdkMeterProvider.builder()
+				.setResource(resource)
+				.registerMetricReader(
+						PeriodicMetricReader.builder(
+										OtlpHttpMetricExporter.builder()
+												.setEndpoint(metricsEndpoint)
+												.addHeader("Authorization", authHeader)
+												.setAggregationTemporalitySelector(AggregationTemporalitySelector.deltaPreferred())
+												.build()
+								)
+								.setInterval(Duration.ofSeconds(10))
+								.build()
+				)
+				.build();
 
 		SpringApplication.run(AccessingDataMysqlApplication.class, args);
 	}
