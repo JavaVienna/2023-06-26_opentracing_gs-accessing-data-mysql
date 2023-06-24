@@ -17,6 +17,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'com.mysql:mysql-connector-j:8.0.33'
+
+	implementation 'io.opentelemetry:opentelemetry-api:1.27.0'
+	implementation 'io.opentelemetry:opentelemetry-sdk:1.27.0'
+	implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.27.0'
+	implementation 'io.opentelemetry:opentelemetry-exporter-otlp-common:1.27.0'
+
+	implementation 'io.opentelemetry:opentelemetry-semconv:1.27.0-alpha'
 }
 
 test {
